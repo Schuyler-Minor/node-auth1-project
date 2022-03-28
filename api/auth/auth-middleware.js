@@ -50,13 +50,24 @@ async function checkUsernameFree(req, res, next) {
   }
 */
 async function checkUsernameExists(req, res, next) {
-  let [user] = await Users.findBy({ username: req.user.username });
-  if (user == null) {
-    next({ status: 401, message: "Invalid credentials" });
-  } else {
-    req.user.hash = user.password;
-    next();
+  try {
+    const users = await Users.findBy({ username: req.body.username });
+    if (users.length) {
+      next();
+    } else {
+      next({ status: 401, message: "Invalid Credentials" });
+    }
+  } catch (error) {
+    next(error);
   }
+
+  // let [user] = await Users.findBy({ username: req.user.username });
+  // if (user == null) {
+  //   next({ status: 401, message: "Invalid credentials" });
+  // } else {
+  //   req.user.hash = user.password;
+  //   next();
+  // }
 }
 
 /*
