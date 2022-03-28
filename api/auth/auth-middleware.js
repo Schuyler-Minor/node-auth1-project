@@ -8,14 +8,16 @@ const Users = require("../users/users-model");
   }
 */
 function restricted(req, res, next) {
-  if (req.session.user) {
-    next();
-  } else {
-    next({
-      status: 401,
-      message: "You shall not pass!",
-    });
-  }
+  console.log("restricted");
+  next();
+  // if (req.session.user) {
+  //   next();
+  // } else {
+  //   next({
+  //     status: 401,
+  //     message: "You shall not pass!",
+  //   });
+  // }
 }
 
 /*
@@ -27,11 +29,15 @@ function restricted(req, res, next) {
   }
 */
 async function checkUsernameFree(req, res, next) {
-  let [user] = await Users.findBy({ username: req.user.username });
-  if (user != null) {
-    next({ status: 422, message: "Username taken" });
-  } else {
-    next();
+  try {
+    const users = await Users.findBy({ username: req.body.username });
+    if (!users.length) {
+      next();
+    } else {
+      next({ status: 422, message: "Username taken" });
+    }
+  } catch (error) {
+    next(error);
   }
 }
 
@@ -61,7 +67,9 @@ async function checkUsernameExists(req, res, next) {
     "message": "Password must be longer than 3 chars"
   }
 */
-function checkPasswordLength(req, res, next) {}
+function checkPasswordLength(req, res, next) {
+  next();
+}
 
 // Don't forget to add these to the `exports` object so they can be required in other modules
 
